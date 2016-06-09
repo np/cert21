@@ -1,0 +1,57 @@
+basePath: /
+definitions:
+  x509component:
+    properties:
+      key: {type: string}
+      value: {type: string}
+    type: object
+  x509name:
+    items: {$ref: '#/definitions/x509component'}
+    type: array
+host: 10.244.165.172:7002
+info:
+  contact: {email: np.21@nicolaspouillard.fr, name: Nicolas Pouillard}
+  description: Return TLS certificate information for bitcoin.
+  title: cert21
+  version: '0.1'
+  x-21-category: utilities
+  x-21-github-project-url: https://github.com/np/cert21
+  x-21-keywords: [tls, ssl, cert, certificate, network]
+  x-21-quick-buy: "$ 21 buy url http://<ZEROTIER IP>:7002/?uri=google.com"
+  x-21-total-price: {max: 50, min: 50}
+  x-21-implements-meta:
+    x-cert21-city: "{CITY}"
+    x-cert21-state": "{STATE}"
+    x-cert21-country": "{COUNTRY}"
+paths:
+  /:
+    get:
+      consumes: [application/x-www-form-urlencoded]
+      produces: [application/json]
+      responses:
+        200:
+          description: TLS certificate information on server location.
+          schema:
+            properties:
+              cert:
+                properties:
+                  digest:
+                    properties:
+                      md5: {type: string}
+                      sha1: {type: string}
+                      sha256: {type: string}
+                    type: object
+                  subject: {$ref: '#/definitions/x509name'}
+                  issuer: {$ref: '#/definitions/x509name'}
+                  expired: {type: boolean}
+                  not_before: {type: string}
+                  not_after: {type: string}
+                  pubkey: {type: string}
+                  serial_number: {type: number}
+                  version: {type: number}
+                type: object
+            type: object
+      summary: Return TLS certificate information of the given host or IP as seen from this device.
+schemes: [http]
+swagger: '2.0'
+x-21-manifest-path: /manifest
