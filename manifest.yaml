@@ -21,8 +21,8 @@ info:
   x-21-total-price: {max: 50, min: 50}
   x-21-implements-meta:
     x-cert21-city: "{CITY}"
-    x-cert21-state": "{STATE}"
-    x-cert21-country": "{COUNTRY}"
+    x-cert21-state: "{STATE}"
+    x-cert21-country: "{COUNTRY}"
 paths:
   /:
     get:

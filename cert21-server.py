@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json
-import yaml
 import os
 import psutil
 import subprocess
-from urllib.parse import urlparse
+import yaml
 
 from flask import Flask
+from flask import request
 
 from two1.wallet.two1_wallet import Wallet
 from two1.bitserv.flask import Payment
+
+from cert21 import cert21
 
 app = Flask(__name__)
 
@@ -40,18 +42,8 @@ def cert():
     except KeyError:
         return 'HTTP Status 400: URI query parameter is missing from your request.', 400
 
-    hostip = ipaddress.ip_address(uri)
-
     try:
-        if hostip.is_private and not ALLOW_PRIVATE:
-            return 'HTTP Status 403: Private IP scanning is forbidden', 403
-    except ValueError:
-        pass
-
-    port = urlparse(uri).port
-
-    try:
-        data = cert21(hostip, port)
+        data = cert21(uri)
         response = json.dumps(data, indent=4, sort_keys=True)
         return response
     except ValueError as e:
@@ -63,7 +55,9 @@ if __name__ == "__main__":
     @click.command()
     @click.option("-d", "--daemon", default=False, is_flag=True,
                   help="Run in daemon mode.")
-    def run(daemon):
+    @click.option("-D", "--debug", default=False, is_flag=True,
+                  help="Run in debug mode.")
+    def run(daemon, debug):
         if daemon:
             pid_file = './cert21.pid'
             if os.path.isfile(pid_file):
@@ -81,6 +75,6 @@ if __name__ == "__main__":
                 raise ValueError("error starting cert21-server.py daemon")
         else:
             print("Server running...")
-            app.run(host='0.0.0.0', port=7002)
+            app.run(host='0.0.0.0', port=7002, debug=debug)
 
     run()

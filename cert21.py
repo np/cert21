@@ -5,6 +5,7 @@
 import ssl
 import sys
 import json
+from urllib.parse import urlparse
 from OpenSSL import crypto
 from OpenSSL._util import lib as cryptolib
 
@@ -34,8 +35,24 @@ def decode_x509cert(cert):
         'version': cert.get_version()
     }
 
-def cert21(host, port=443):
-    sslcert = ssl.get_server_certificate((host, port))
+def cert21(orig_uri):
+    if '://' in orig_uri:
+      uri = urlparse(orig_uri)
+      host = uri.hostname
+      port = uri.port
+    elif ':' in orig_uri:
+      (host,port) = orig_uri.split(':')
+    else:
+      host = orig_uri
+
+    if host is None:
+      raise ValueError("unexpected uri " + orig_uri + " (no host)")
+
+    if port is None:
+      port = 443
+
+    # The selection of the protocol version is quite sensitive
+    sslcert = ssl.get_server_certificate((host, port), ssl_version=ssl.PROTOCOL_TLSv1_2)
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, sslcert)
     return {'cert': decode_x509cert(cert)}
 
