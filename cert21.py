@@ -44,6 +44,7 @@ def cert21(orig_uri):
       (host,port) = orig_uri.split(':')
     else:
       host = orig_uri
+      port = 443
 
     if host is None:
       raise ValueError("unexpected uri " + orig_uri + " (no host)")
